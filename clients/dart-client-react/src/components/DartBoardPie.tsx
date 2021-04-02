@@ -5,9 +5,21 @@ interface PieProps {
   size: number;
   color: string;
   rotate: number;
+  number: number;
+  onClick: (val: number) => void;
 }
 
-const StyledSpan = styled('span')((props: PieProps) => `
+interface SpanProps {
+  size: number;
+  color: string;
+}
+
+interface DivProps {
+  size: number;
+  rotate: number;
+}
+
+const StyledSpan = styled('span')((props: SpanProps) => `
   width: ${props.size}px;
   height: ${props.size}px;
   border-radius: 0 ${props.size}px 0 0;
@@ -19,9 +31,15 @@ const StyledSpan = styled('span')((props: PieProps) => `
   box-shadow: inset 0 0 5px rgb(0 0 0 / 80%);
   transform: skewX(72deg);
   position: absolute;
+  pointer-events: auto;
+  overflow: hidden;
+  cursor:pointer;
+  &:hover {
+    background: white;
+  }
 `)
 
-const StyledDiv = styled('div')((props: PieProps) => `
+const StyledDiv = styled('div')((props: DivProps) => `
   width: ${props.size}px;
   height: ${props.size}px;
   left: ${props.size}px;
@@ -30,11 +48,16 @@ const StyledDiv = styled('div')((props: PieProps) => `
   overflow: hidden;
   top: 0px;
   transform: rotate(${props.rotate}deg) skewX(-72deg);
+  pointer-events: none;
+  cursor:pointer;
+  &:hover {
+    background: white;
+  }
 `)
 
-const Pie: FC<PieProps> = ({ size, color, rotate }): ReactElement => {
+const Pie: FC<PieProps> = ({ size, color, rotate, number, onClick }): ReactElement => {
   return (
-    <StyledDiv size={size} color={color} rotate={rotate}><StyledSpan size={size} color={color} rotate={rotate}></StyledSpan></StyledDiv>
+    <StyledDiv onClick={ev => onClick(number)} size={size} rotate={rotate}><StyledSpan size={size} color={color}></StyledSpan></StyledDiv>
   );
 };
 

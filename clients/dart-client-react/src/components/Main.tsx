@@ -1,10 +1,11 @@
 import React, { ReactElement, FC } from "react";
 import { Container, Grid } from "@material-ui/core"
-import { GameData } from "../../../../server/src/interfaces";
+import { AddThrow, GameData } from "../../../../server/src/interfaces";
 import { makeStyles } from '@material-ui/core/styles';
 import PlayerTable from './PlayerTable';
-import DartBoard from './DartBoard';
 import ButtonGrid from './ButtonGrid';
+import { insertThrow } from "api";
+import { Multiplier } from "models/interfaces";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -32,15 +33,24 @@ interface MainProps {
 
 const Main: FC<MainProps> = ( { currentGame, gameId }): ReactElement => {
   const styles = useStyles();
+
+  const sendScore = async (field: number, multiplier?: Multiplier) => {
+    const playerThrow: AddThrow = {
+      gameid: gameId,
+      field,
+      multiplier: multiplier ?? '1',
+    }
+    await insertThrow(playerThrow);
+  }
+
   return (
     <Container className={styles.root}>
-      <Grid container spacing={4}>
-        <Grid item md>
-          <PlayerTable currentGame={currentGame}/>
+      <Grid container spacing={2}>
+        <Grid item lg>
+          <PlayerTable currentGame={currentGame} />
         </Grid>
-        <Grid item md>
-          <ButtonGrid gameId={gameId}/>
-          <DartBoard />
+        <Grid item lg>
+          <ButtonGrid gameId={gameId} sendScore={sendScore}/>
         </Grid>
       </Grid>
     </Container>
