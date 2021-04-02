@@ -7,7 +7,7 @@ interface DartBoardNumberProps {
   rotate: number;
 }
 
-const StyledDiv = styled('div')((props: DartBoardNumberProps) => `
+const NumberDiv = styled('div')((props: DartBoardNumberProps) => `
   width: 60px;
   height: 50px;
   color: #ddd;
@@ -24,7 +24,7 @@ const StyledDiv = styled('div')((props: DartBoardNumberProps) => `
 
 const DartBoardNumber: FC<DartBoardNumberProps> = ({ number, location, rotate }): ReactElement => {
   return (
-    <StyledDiv location={location} number={number} rotate={rotate}>{number}</StyledDiv>
+    <NumberDiv location={location} number={number} rotate={rotate}>{number}</NumberDiv>
   );
 };
 

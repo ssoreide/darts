@@ -1,33 +1,19 @@
 import React, { ReactElement, FC } from "react";
 import { Container } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
 import Pie from './DartBoardPie';
 import DartBoardNumber from './DartBoardNumber';
 import { Multiplier } from "models/interfaces";
 import styled from "styled-components";
 
-const useStyles = makeStyles(theme => ({
-  bullsEye: {
-    width: '20px',
-    height: '20px',
-    border: '2px solid #ddd',
-    borderRadius: '20px',
-    position: 'absolute',
-    left: '288px',
-    top: '288px',
-    background: '#a33',
-    boxShadow: '0 0 5px rgb(0 0 0 / 80%)'
-  },
-  root: {
-    padding: '20px',
-    transform: 'scale(0.9)',
-    marginTop: '-40px'
-  }
-}));
-
 interface DartBoardProps {
   sendScore: (field: number, multiplier?: Multiplier) => Promise<void>
 }
+
+const RootContainer = styled(Container)(prop => `
+  padding: 20px;
+  transform: scale(0.9);
+  margin-top: -40px;
+`)
 
 const DartBoardWrapper = styled.div`
   width: 600px;
@@ -127,9 +113,10 @@ const BullsEye = styled.div`
   }
 `
 
+
+
 const DartBoard: FC<DartBoardProps> = ({ sendScore }): ReactElement => {
 
-  const styles = useStyles();
   const northNumbers = [1,4,5,6,9,11,12,13,14,18,20];
   const southNumbers = [8,16,7,19,3,17,2,15,10];
   const pies = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
@@ -185,34 +172,32 @@ const DartBoard: FC<DartBoardProps> = ({ sendScore }): ReactElement => {
   }
 
   return (
-    <Container className={styles.root}> 
-      <div className={styles.root}>
-        <DartBoardWrapper>
-          <RingOne>
-            {/* The outer doubles */}
-            { pies.map(n => <Pie key={n} number={pieToNumberMap[n]} size={223} color={n % 2 === 0 ? '#363' : '#a33'} rotate={pieRotateValues[n]} onClick={field => sendScore(field, '2')} />)}
-          </RingOne>
-          <RingTwo>
-            {/* The outer pies */}
-            { pies.map(n => <Pie key={n} number={pieToNumberMap[n]} size={208} color={n % 2 === 0 ? '#eec' : '#333'} rotate={pieRotateValues[n]} onClick={field => sendScore(field, '1')}/>)}
-          </RingTwo>
-          <RingThree>
-            {/* The inner triples  */}
-            { pies.map(n => <Pie key={n} number={pieToNumberMap[n]} size={150} color={n % 2 === 0 ? '#363' : '#a33'} rotate={pieRotateValues[n]} onClick={field => sendScore(field, '3')}/>)}
-          </RingThree>
-          <RingFour>
-            {/* The inner pies  */}
-            { pies.map(n => <Pie key={n} number={pieToNumberMap[n]} size={135} color={n % 2 === 0 ? '#eec' : '#333'} rotate={pieRotateValues[n]} onClick={field => sendScore(field, '1')}/>)}
-          </RingFour>
-          <SemiBullsEye onClick={ev => sendScore(25)}/>
-          <BullsEye onClick={ev => sendScore(50)}/>
-          <OuterBorder />
-          {/* The numbers around the board */}
-          { northNumbers.map(n => <DartBoardNumber key={n} number={n} location={'top'} rotate={numberRotateValues[n]}/>)}
-          { southNumbers.map(n => <DartBoardNumber key={n} number={n} location={'bottom'} rotate={numberRotateValues[n]}/>)}
-        </DartBoardWrapper>
-      </div>
-    </Container>
+    <RootContainer> 
+      <DartBoardWrapper>
+        <RingOne>
+          {/* The outer doubles */}
+          { pies.map(n => <Pie key={n} number={pieToNumberMap[n]} size={223} color={n % 2 === 0 ? '#363' : '#a33'} rotate={pieRotateValues[n]} onClick={field => sendScore(field, '2')} />)}
+        </RingOne>
+        <RingTwo>
+          {/* The outer pies */}
+          { pies.map(n => <Pie key={n} number={pieToNumberMap[n]} size={208} color={n % 2 === 0 ? '#eec' : '#333'} rotate={pieRotateValues[n]} onClick={field => sendScore(field, '1')}/>)}
+        </RingTwo>
+        <RingThree>
+          {/* The inner triples  */}
+          { pies.map(n => <Pie key={n} number={pieToNumberMap[n]} size={150} color={n % 2 === 0 ? '#363' : '#a33'} rotate={pieRotateValues[n]} onClick={field => sendScore(field, '3')}/>)}
+        </RingThree>
+        <RingFour>
+          {/* The inner pies  */}
+          { pies.map(n => <Pie key={n} number={pieToNumberMap[n]} size={135} color={n % 2 === 0 ? '#eec' : '#333'} rotate={pieRotateValues[n]} onClick={field => sendScore(field, '1')}/>)}
+        </RingFour>
+        <SemiBullsEye onClick={ev => sendScore(25)}/>
+        <BullsEye onClick={ev => sendScore(50)}/>
+        <OuterBorder />
+        {/* The numbers around the board */}
+        { northNumbers.map(n => <DartBoardNumber key={n} number={n} location={'top'} rotate={numberRotateValues[n]}/>)}
+        { southNumbers.map(n => <DartBoardNumber key={n} number={n} location={'bottom'} rotate={numberRotateValues[n]}/>)}
+      </DartBoardWrapper>
+    </RootContainer>
   );
 };
 

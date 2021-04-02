@@ -1,30 +1,15 @@
 import React, { ReactElement, FC } from "react";
 import { Container, Grid } from "@material-ui/core"
 import { AddThrow, GameData } from "../../../../server/src/interfaces";
-import { makeStyles } from '@material-ui/core/styles';
 import PlayerTable from './PlayerTable';
 import ButtonGrid from './ButtonGrid';
 import { insertThrow } from "api";
 import { Multiplier } from "models/interfaces";
+import styled from "styled-components";
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    paddingTop: '20px',
-  },
-  active: {
-    color: 'blue'
-  },
-  busted: {
-    color: 'red'
-  },
-  done: {
-    color: 'green'
-  },
-  currentPlayer: {
-    paddingBottom: '10px',
-    textAlign: 'center'
-  }
-}));
+const RootContainer = styled(Container)(prop => `
+  padding-top: 20px;
+`)
 
 interface MainProps {
   currentGame: GameData | null;
@@ -32,8 +17,6 @@ interface MainProps {
 }
 
 const Main: FC<MainProps> = ( { currentGame, gameId }): ReactElement => {
-  const styles = useStyles();
-
   const sendScore = async (field: number, multiplier?: Multiplier) => {
     const playerThrow: AddThrow = {
       gameid: gameId,
@@ -44,16 +27,16 @@ const Main: FC<MainProps> = ( { currentGame, gameId }): ReactElement => {
   }
 
   return (
-    <Container className={styles.root}>
+    <RootContainer>
       <Grid container spacing={2}>
-        <Grid item lg>
+        <Grid item xs={12} lg={5}>
           <PlayerTable currentGame={currentGame} />
         </Grid>
-        <Grid item lg>
+        <Grid item xs={12} lg={7}>
           <ButtonGrid gameId={gameId} sendScore={sendScore}/>
         </Grid>
       </Grid>
-    </Container>
+    </RootContainer>
   );
 };
 export default Main;

@@ -4,16 +4,14 @@ import { Button, Dialog, DialogTitle, DialogContent, TextField, DialogActions, L
 import Grid from '@material-ui/core/Grid';
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
-import { makeStyles } from '@material-ui/core/styles';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import { isEmpty } from 'lodash';
+import styled from "styled-components";
 
-const useStyles = makeStyles(theme => ({
-  dialog: {
-    minWidth: '500px',
-  },
-}));
+const StyledDialog = styled(DialogContent)(prop => `
+  min-width: 500px;
+`)
 
 interface CreateGameDialogProps  {
   openDialog: boolean;
@@ -22,7 +20,6 @@ interface CreateGameDialogProps  {
 }
 
 const CreateGameDialog: FC<CreateGameDialogProps> = ( { openDialog, doOpenDialog, doCreateGame }): ReactElement => {
-  const styles = useStyles();
   const [newPlayers, setNewPlayers] = useState([] as string[]);
   const [playerName, setPlayerName] = useState('Your name');
   const [errorText, setErrorText] = useState('');
@@ -76,7 +73,7 @@ const CreateGameDialog: FC<CreateGameDialogProps> = ( { openDialog, doOpenDialog
   return (
     <Dialog open={openDialog} onClose={handleClose} aria-labelledby="form-dialog-title" maxWidth="md">
       <DialogTitle>Create new game</DialogTitle>
-      <DialogContent className={styles.dialog}>
+      <StyledDialog>
         <Grid container spacing={4}>
           <Grid item xs>
             <Grid container>
@@ -128,7 +125,7 @@ const CreateGameDialog: FC<CreateGameDialogProps> = ( { openDialog, doOpenDialog
             </List>
           </Grid>
         </Grid>
-      </DialogContent>
+      </StyledDialog>
       <DialogActions>
         <Button onClick={handleClose} color="primary">Cancel</Button>
         <Button onClick={doCreate} color="primary" disabled={newPlayers.length === 0}>Create</Button>

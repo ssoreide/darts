@@ -1,7 +1,6 @@
 import React, { ReactElement, FC, useState } from "react";
 import Header from './Header';
 import { Container, Toolbar } from '@material-ui/core';
-import CssBaseline from '@material-ui/core/CssBaseline';
 import { APP_TITLE, POLLING_INTERVAL_IN_MS } from "utils/constants";
 import Main from "./Main";
 import { GameData } from "../../../../server/src/interfaces";
@@ -80,8 +79,7 @@ const Layout: FC<LayoutProps> = (): ReactElement => {
   }, [gameId]);
 
   return (
-    <Container maxWidth="lg">
-      <CssBaseline />
+    <Container maxWidth="xl">
       <Header title={APP_TITLE} loadGame={loadGame} currentGameId={gameId} doCreateGame={doCreateGame} doSetGame={doSetGame}/>
       <Toolbar />
       <Main currentGame={game} gameId={gameId} />

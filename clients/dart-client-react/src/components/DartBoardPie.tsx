@@ -19,7 +19,7 @@ interface DivProps {
   rotate: number;
 }
 
-const StyledSpan = styled('span')((props: SpanProps) => `
+const InnerSpan = styled('span')((props: SpanProps) => `
   width: ${props.size}px;
   height: ${props.size}px;
   border-radius: 0 ${props.size}px 0 0;
@@ -39,7 +39,7 @@ const StyledSpan = styled('span')((props: SpanProps) => `
   }
 `)
 
-const StyledDiv = styled('div')((props: DivProps) => `
+const OuterDiv = styled('div')((props: DivProps) => `
   width: ${props.size}px;
   height: ${props.size}px;
   left: ${props.size}px;
@@ -57,7 +57,7 @@ const StyledDiv = styled('div')((props: DivProps) => `
 
 const Pie: FC<PieProps> = ({ size, color, rotate, number, onClick }): ReactElement => {
   return (
-    <StyledDiv onClick={ev => onClick(number)} size={size} rotate={rotate}><StyledSpan size={size} color={color}></StyledSpan></StyledDiv>
+    <OuterDiv onClick={ev => onClick(number)} size={size} rotate={rotate}><InnerSpan size={size} color={color}></InnerSpan></OuterDiv>
   );
 };
 
