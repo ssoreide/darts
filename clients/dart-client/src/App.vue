@@ -68,6 +68,7 @@ import Component from 'vue-class-component'
 import ActiveGame from './components/ActiveGame.vue';
 import NewGame, { apiAxios } from './components/NewGame.vue';
 import * as settings from './settings';
+import store from './store';
 
 @Component({
     components : {
@@ -84,6 +85,7 @@ export default class App extends Vue {
     async joinLatestGame() {
         let response = await apiAxios.get(settings.urlprefix+"/getLatestGame");
         this.gameid = response.data.gameid;
+        await store.dispatch('setGame', this.gameid); 
     }
 
     startGame(gameid: string) {
@@ -91,9 +93,10 @@ export default class App extends Vue {
         this.createGameDialog = false;
     }
 
-    joinGame() {
+    async joinGame() {
         this.gameid = this.gameidjoin;
         this.joinGameDialog = false;
+        await this.$store.dispatch('setGame', this.gameid); 
     }
 
 }

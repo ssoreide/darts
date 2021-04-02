@@ -11,13 +11,17 @@ const state = {
       }    
 };
 
+function send(message: any) {
+    Vue.prototype.$socket.send(message);
+}
+
 const store = new Vuex.Store({
     state,
     mutations: {
       SOCKET_ONOPEN(state, event)  {
         Vue.prototype.$socket = event.currentTarget;
         state.socket.isConnected = true;
-        Vue.prototype.$socket.send('{ "message": "test"}');
+        send('{ "message": "test2"}');
         console.log("SOCKET_ONOPEN");
       },
       SOCKET_ONCLOSE(state, event)  {
@@ -46,7 +50,9 @@ const store = new Vuex.Store({
 
     },
     actions: {
-
+        setGame: async (context, gameId: string) => {
+            send(JSON.stringify({subscribeToGame: gameId}));
+        },
     }
 });
   
