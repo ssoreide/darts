@@ -95,7 +95,7 @@ const Layout: FC<LayoutProps> = (): ReactElement => {
    * TODO - server / client side logic should be rather similar. Should probably factor out.
    */
   const optimisticallyInsertThrow = (playerThrow: AddThrow) => {
-    if (!game || !game.playerstat.some(p => p.status === 'playing'  || p.status === 'bust')) return;
+    if (!game || !game?.playerstat?.some(p => p.status === 'playing'  || p.status === 'bust')) return;
     const copy = cloneDeep(game);
     const playerIndex = copy.playerstat.findIndex(p => p.player === copy.currentPlayer);
     if (playerIndex >= 0) {
