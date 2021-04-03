@@ -14,17 +14,10 @@ const RootContainer = styled(Container)(prop => `
 interface MainProps {
   currentGame: GameData | null;
   gameId: string;
+  sendScore: (field: number, multiplier?: Multiplier) => Promise<void>;
 }
 
-const Main: FC<MainProps> = ( { currentGame, gameId }): ReactElement => {
-  const sendScore = async (field: number, multiplier?: Multiplier) => {
-    const playerThrow: AddThrow = {
-      gameid: gameId,
-      field,
-      multiplier: multiplier ?? '1',
-    }
-    await insertThrow(playerThrow);
-  }
+const Main: FC<MainProps> = ( { currentGame, gameId, sendScore }): ReactElement => {
 
   return (
     <RootContainer>

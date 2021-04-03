@@ -19,40 +19,41 @@ interface DivProps {
   rotate: number;
 }
 
+const CommonStyles = `
+  top: 0px;
+  position: absolute;
+  cursor:pointer;
+  overflow:hidden;
+  box-shadow: inset 0 0 5px rgb(0 0 0 / 80%);
+  &:hover {
+    background: white;
+  }
+  &:active {
+    box-shadow: inset 0 2px 15px rgb(0 0 0 / 80%);
+  }
+`
+
 const InnerSpan = styled('span')((props: SpanProps) => `
+  ${CommonStyles}
   width: ${props.size}px;
   height: ${props.size}px;
   border-radius: 0 ${props.size}px 0 0;
   transform-origin: 0 ${props.size}px;
   background: ${props.color};
   left: 0px;
-  top: 0px;
   display: block;
-  box-shadow: inset 0 0 5px rgb(0 0 0 / 80%);
   transform: skewX(72deg);
-  position: absolute;
   pointer-events: auto;
-  overflow: hidden;
-  cursor:pointer;
-  &:hover {
-    background: white;
-  }
 `)
 
 const OuterDiv = styled('div')((props: DivProps) => `
+  ${CommonStyles}
   width: ${props.size}px;
   height: ${props.size}px;
   left: ${props.size}px;
   transform-origin: 0 ${props.size}px;
-  position: absolute;
-  overflow: hidden;
-  top: 0px;
   transform: rotate(${props.rotate}deg) skewX(-72deg);
   pointer-events: none;
-  cursor:pointer;
-  &:hover {
-    background: white;
-  }
 `)
 
 const Pie: FC<PieProps> = ({ size, color, rotate, number, onClick }): ReactElement => {
