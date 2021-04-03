@@ -119,7 +119,7 @@ const Layout: FC<LayoutProps> = (): ReactElement => {
         goToNext = player.lastThrows.length === 3;
       }
       player.score = Math.max(newScore, 0);
-      if (goToNext) {
+      if (goToNext && copy.playerstat.some(p => p.status === 'playing')) {
         let nextPlayer: undefined | PlayerStat = undefined;
         let indexPointer = playerIndex;
         while (nextPlayer === undefined) {

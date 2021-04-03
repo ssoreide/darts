@@ -113,8 +113,6 @@ const BullsEye = styled.div`
   }
 `
 
-
-
 const DartBoard: FC<DartBoardProps> = ({ sendScore }): ReactElement => {
 
   const northNumbers = [1,4,5,6,9,11,12,13,14,18,20];

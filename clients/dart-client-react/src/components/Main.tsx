@@ -1,9 +1,8 @@
 import React, { ReactElement, FC } from "react";
 import { Container, Grid } from "@material-ui/core"
-import { AddThrow, GameData } from "../../../../server/src/interfaces";
+import { GameData } from "../../../../server/src/interfaces";
 import PlayerTable from './PlayerTable';
 import ButtonGrid from './ButtonGrid';
-import { insertThrow } from "api";
 import { Multiplier } from "models/interfaces";
 import styled from "styled-components";
 
