@@ -8,6 +8,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import styled from "styled-components";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -17,7 +18,7 @@ const useStyles = makeStyles(theme => ({
     background: '#007eff3b'
   },
   busted: {
-    color: '#ff00003b'
+    background: '#ff00003b'
   },
   done: {
     background: '#00ff1f3b'

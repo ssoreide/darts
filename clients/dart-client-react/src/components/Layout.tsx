@@ -95,7 +95,7 @@ const Layout: FC<LayoutProps> = (): ReactElement => {
    * TODO - server / client side logic should be rather similar. Should probably factor out.
    */
   const optimisticallyInsertThrow = (playerThrow: AddThrow) => {
-    if (!game || !game.playerstat.some(p => p.status === 'playing')) return;
+    if (!game || !game?.playerstat?.some(p => p.status === 'playing'  || p.status === 'bust')) return;
     const copy = cloneDeep(game);
     const playerIndex = copy.playerstat.findIndex(p => p.player === copy.currentPlayer);
     if (playerIndex >= 0) {
@@ -119,7 +119,7 @@ const Layout: FC<LayoutProps> = (): ReactElement => {
         goToNext = player.lastThrows.length === 3;
       }
       player.score = Math.max(newScore, 0);
-      if (goToNext) {
+      if (goToNext && copy.playerstat.some(p => p.status === 'playing' || p.status === 'bust')) {
         let nextPlayer: undefined | PlayerStat = undefined;
         let indexPointer = playerIndex;
         while (nextPlayer === undefined) {
