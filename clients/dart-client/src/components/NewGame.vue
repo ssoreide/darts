@@ -33,10 +33,6 @@
 <script lang="ts">
 import Vue from 'vue'
 import Component from 'vue-class-component'
-import axios from 'axios';
-import * as settings from '../settings'
-
-export let apiAxios = axios.create();
 
 @Component
 export default class NewGame extends Vue {
@@ -48,13 +44,7 @@ export default class NewGame extends Vue {
     }
 
     async createGame(): Promise<void> {
-        if (this.players.length !== 0) {
-            apiAxios.post(settings.urlprefix+"/createGame", {
-                players : this.players
-            }).then(result => {
-                this.$emit("gameCreated", result.data.gameid);
-            });
-        }
+        this.$emit("gameCreated", this.players);
     }
 }
 

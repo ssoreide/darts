@@ -16,7 +16,7 @@
         />
       </div>
 
-      <span class="mr-2">GAME: {{gameid}}</span>
+      <span class="mr-2">GAME: {{$store.getters.gameid}}</span>
       <v-spacer></v-spacer>
         <v-btn color="secondary" class="mr-3" @click="createGameDialog = true;"> New game </v-btn>
         <v-btn color="secondary" class="mr-3" @click="joinGameDialog = true;"> Join game </v-btn>
@@ -32,7 +32,7 @@
         <v-card-title class="headline">
           Create new game
         </v-card-title>
-        <v-card-text><NewGame @gameCreated="startGame"/></v-card-text>
+        <v-card-text><NewGame @gameCreated="gameCreated"/></v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
         </v-card-actions>
@@ -66,8 +66,7 @@
 import Vue from 'vue';
 import Component from 'vue-class-component'
 import ActiveGame from './components/ActiveGame.vue';
-import NewGame, { apiAxios } from './components/NewGame.vue';
-import * as settings from './settings';
+import NewGame from './components/NewGame.vue';
 import store from './store';
 
 @Component({
@@ -83,13 +82,11 @@ export default class App extends Vue {
     private joinGameDialog = false;
 
     async joinLatestGame() {
-        let response = await apiAxios.get(settings.urlprefix+"/getLatestGame");
-        this.gameid = response.data.gameid;
-        await store.dispatch('setGame', this.gameid); 
+        await store.dispatch('joinLatestGame'); 
     }
 
-    startGame(gameid: string) {
-        this.gameid = gameid;
+    gameCreated(players: string[]) {
+        store.dispatch('createGame', players); 
         this.createGameDialog = false;
     }
 

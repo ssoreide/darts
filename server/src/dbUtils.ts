@@ -1,6 +1,6 @@
 import { DocumentClient } from "aws-sdk/clients/dynamodb";
 import { DynamoDB } from 'aws-sdk';
-import { AddThrow, Throw } from './interfaces';
+import { AddThrow, GameData, PlayerStat, Throw } from './interfaces';
 
 const database = new DynamoDB({ region: 'eu-north-1' });
 const documentClient = new DocumentClient({ region: 'eu-north-1' });
@@ -95,10 +95,12 @@ export async function addThrow(t: AddThrow): Promise<void> {
     await database.updateItem(params).promise();
 }
 
-export async function addWebSocketConnection(connectionId: string): Promise<void> {
-    let UpdateExpression = "set dummy = :dummy";
+export async function addWebSocketSubscription(connectionId: string, gameId: string): Promise<void> {
+    await deleteWebSocketSubscriptions(connectionId); // Delete potential existing subscriptions
+    let UpdateExpression = "set gs1pk = :gs1pk, gs1sk = :gs1sk";
     let ExpressionAttributeValues: any = {
-        ":dummy": { S: "testing" }
+        ":gs1pk": { S: "g#" + gameId },
+        ":gs1sk": { S: "ws#" + connectionId }
    };
     let dateobj = new Date();
     let timestamp = dateobj.toISOString();
@@ -113,4 +115,102 @@ export async function addWebSocketConnection(connectionId: string): Promise<void
     };
 
     await database.updateItem(params).promise();
+}
+
+export async function deleteWebSocketSubscriptions(connectionId: string): Promise<void> {
+    let params = {
+        TableName: 'mainTable',
+        KeyConditionExpression: "#pk = :connectionId",
+        ExpressionAttributeNames: {
+            "#pk": "pk",
+        },
+        ScanIndexForward: false,
+        ExpressionAttributeValues: {
+            ":connectionId": "ws#" +connectionId
+        }
+    }
+    let connections = await documentClient.query(params).promise(); // Should only be one connection, in theory, but just to be sure
+    let deletions = connections.Items.map(connection => {
+        let deleteparams = {
+            TableName: 'mainTable',
+            Key: {
+                'pk': { S: connection.pk },
+                'sk': { S: connection.sk }
+            }
+        };
+        console.log("Deleting:",deleteparams);
+        return database.deleteItem(deleteparams).promise();        
+    });
+    await Promise.all(deletions);
+}
+
+export async function getGameData(gameid: string) : Promise<GameData> {
+    console.log("Gettting data for game id: " + gameid);
+    try {
+        let gameThrows = await getGameThrows(gameid);
+        console.log("gamethrows: ", gameThrows);
+        let players = await getGamePlayers(gameid);
+        console.log("players: ", players);
+
+        let playerstat:PlayerStat[] = [];
+        for(let p in players) {
+            playerstat[p] = { player: players[p], score: 501, status: "playing", lastThrows: [] };
+        }
+
+        let playernumber = 0;
+        let throwsInTurn: Throw[] = [];
+        gameThrows.forEach( (t, i) => {
+            
+            playerstat[playernumber].status = "playing";
+            playerstat[playernumber].score -= t.field * t.multiplier;
+            throwsInTurn.push(t);
+            playerstat[playernumber].lastThrows.push(t);
+            let nextTurn = false;
+            if (playerstat[playernumber].score < 0) { // BUST¨
+                if (i == gameThrows.length - 1) {
+                    playerstat[playernumber].status = "bust";
+                }
+                nextTurn = true;
+                throwsInTurn.forEach( (t) => {
+                    playerstat[playernumber].score += t.field * t.multiplier;
+                })
+            }
+            if(playerstat[playernumber].score == 0) {
+                if (i == gameThrows.length - 1) {      
+                    playerstat[playernumber].status = "wonjustnow";
+                } else {
+                    playerstat[playernumber].status = "haswon";
+                }
+                nextTurn = true;
+            }  
+            if(throwsInTurn.length>=3 || nextTurn) {
+                throwsInTurn = [];
+                playernumber++;
+                playernumber%=players.length;
+                let skips = 0;
+                while(playerstat[playernumber].score==0 && skips <= players.length) { // Skip winners
+                    playernumber++;
+                    playernumber%=players.length;
+                    skips++;
+                }
+                playerstat[playernumber].lastThrows = [];
+            }
+        });
+
+        return {
+            throws: gameThrows,
+            playerstat,
+            currentPlayer: players[playernumber],
+            throwsInTurn
+        };    
+    }
+    catch (error) {
+        console.log("It crashed",error);
+        return {
+            throws: [],
+            playerstat: [],
+            currentPlayer: "",
+            throwsInTurn: []
+        };    
+    }
 }

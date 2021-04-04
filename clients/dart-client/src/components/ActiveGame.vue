@@ -2,7 +2,7 @@
   <v-container>
     <v-row class="text-center">
       <v-col cols="12">
-            <h1>Current Player: {{currentPlayer}}</h1>
+            <h1>Current Player: {{$store.getters.currentPlayer}}</h1>
             <v-simple-table>
                 <template v-slot:default>
                 <thead>
@@ -29,7 +29,7 @@
                 </thead>
                 <tbody>
                     <tr
-                    v-for="player in players"
+                    v-for="player in $store.getters.playerstats"
                     :key="player.name"
                     v-bind:style="{ color: activeColor(player) }"
                     >
@@ -51,7 +51,7 @@
                     <v-row>
                         <v-col cols="6">
                             <v-text-field type="number" v-model="field"></v-text-field>
-                            <v-btn color="green" @click="sendThrow">Send</v-btn>
+                            <v-btn color="green" @click="insertThrow">Send</v-btn>
                             <v-btn color="red" @click="undoThrow">Undo last throw</v-btn>
                         </v-col>
                         <v-col>
@@ -64,17 +64,17 @@
                         <v-col cols="3">
                             <v-row>
                                 <v-col>
-                                    <v-btn @click="sendThrowDirect('0')" class="pr-0 pl-0" block>0</v-btn>
+                                    <v-btn @click="insertThrowDirect('0')" class="pr-0 pl-0" block>0</v-btn>
                                 </v-col>
                             </v-row>
                             <v-row>
                                 <v-col>
-                                    <v-btn @click="sendThrowDirect('25')" class="pr-0 pl-0" block>25</v-btn>
+                                    <v-btn @click="insertThrowDirect('25')" class="pr-0 pl-0" block>25</v-btn>
                                 </v-col>
                             </v-row>
                             <v-row>
                                 <v-col>
-                                    <v-btn @click="sendThrowDirect('50')" class="pr-0 pl-0" block>50</v-btn>
+                                    <v-btn @click="insertThrowDirect('50')" class="pr-0 pl-0" block>50</v-btn>
                                 </v-col>
                             </v-row>
                         </v-col>
@@ -88,7 +88,7 @@
         <v-col>
             <v-row v-for="r in [1,2,3,4]" v-bind:key="r">
                 <v-col v-for="c in [1,2,3,4,5]" v-bind:key="c">
-                    <v-btn @click="sendThrowDirect(c+(r-1)*5)" class="pr-0 pl-0" block>{{c+(r-1)*5}}</v-btn>
+                    <v-btn @click="insertThrowDirect(c+(r-1)*5)" class="pr-0 pl-0" block>{{c+(r-1)*5}}</v-btn>
                 </v-col>
             </v-row>
         </v-col>
@@ -98,92 +98,46 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { Component, Prop } from 'vue-property-decorator';
-import { PlayerStat, Throw } from '../../../../server/src/interfaces'
-import * as settings from '../settings'
-import axios from 'axios';
-export let apiAxios = axios.create();
+import { Component } from 'vue-property-decorator';
+import { PlayerStat } from '../../../../server/src/interfaces'
+
+import store from '../store';
 
 @Component
 export default class ActiveGame extends Vue {
-    @Prop() gameid!: string;
-    private players = [];
     private field = "";
     private multiplier = "1";
-    private currentPlayer = "nobody";
-    private throwsInTurn = [];
    
-    activeColor(player : PlayerStat) {
-        if (player.score == 0) return "green";
-        if (player.status == "bust") return "red";
-        if (player.player == this.currentPlayer) return "blue";
-    }
-
-    currentThrows() {
-        let dings = "";
-        this.throwsInTurn.forEach( (t: Throw) => {
-            dings+=t.multiplier*t.field + ", "
-        })
-        return dings;
+    activeColor(p : PlayerStat) {
+        if (p.score == 0) return "green";
+        if (p.status == "bust") return "red";
+        if (p.player == store.state.currentPlayer) return "blue";
     }
 
     mounted() {
-        setInterval( () => {
-            if(this.gameid!="") {
-                this.updateGameData();
-            }
-        }, 1000); 
         // this.initSpeech().catch(ex => {
         //     console.log("ex",ex);
         // })
     }
 
-    async updateGameData() {
-        let r = await fetch(settings.urlprefix+"/getGameData?gameid="+this.gameid);
-        let robj = await r.json();
-        console.log("PP", robj.playerstat);
-        this.players = robj.playerstat;
-        this.currentPlayer = robj.currentPlayer;
-        this.throwsInTurn = robj.throwsInTurn;
-    }
-
     async undoThrow() {
-        const throwBody = { gameid: this.gameid };
-        await apiAxios.post(settings.urlprefix+"/undoThrow", throwBody).then(result => {
-            console.log("Throw deleted!");
-        });
-        this.updateGameData();
+        store.dispatch('undoThrow'); 
     }
 
-    sendThrow() {
+    insertThrow() {
         let f = parseInt(this.field);
         let m = parseInt(this.multiplier);
-        this.insertThrow(f,m);
+        store.dispatch('insertThrow', { field: f, multiplier: m }); 
         this.field = '';
         this.multiplier = '1';
     }
 
-    sendThrowDirect(value: string) {
-        console.log("Players:");
-        console.dir(this.players);
+    insertThrowDirect(value: string) {
         let f = parseInt(value);
         let m = parseInt(this.multiplier);
-        this.insertThrow(f,m);
+        store.dispatch('insertThrow', { field: f, multiplier: m }); 
         this.field = '';
         this.multiplier = '1';
-    }
-
-    async insertThrow(field: number, multiplier: number) {
-        const throwBody = 
-        { 
-            gameid: this.gameid,
-            field, 
-            multiplier 
-            };
-        await apiAxios.post(settings.urlprefix+"/insertThrow", throwBody).then(result => {
-            console.log("Throw inserted");
-        });
-        this.updateGameData();
     }
 
     async initSpeech() {
@@ -212,9 +166,6 @@ export default class ActiveGame extends Vue {
             },
         });
 
-        console.log("mediaStream:", mediaStream);
-        
-
         const audioContext = new AudioContext();
         const recognizerNode = audioContext.createScriptProcessor(4096, 1, 1)
         recognizerNode.onaudioprocess = (event) => {
@@ -228,7 +179,5 @@ export default class ActiveGame extends Vue {
         console.log("source: ", source);
         source.connect(recognizerNode);
     }
-
 }
-
 </script>
