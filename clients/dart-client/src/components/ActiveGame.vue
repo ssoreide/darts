@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row class="text-center">
-      <v-col cols="6">
+      <v-col cols="12">
         <h1>Current Player: {{$store.getters.currentPlayer}}</h1>
         <v-simple-table>
             <template v-slot:default>
@@ -35,13 +35,13 @@
                 <td>{{ player.player }}</td>
                 <td>{{ player.score }}</td>
                 <td>{{ player.status }}</td>
-                <td style="white-space: pre" v-for="theThrow in player.lastThrows" :key="theThrow.timestamp">{{ theThrow.field }}</td>
+                <td style="white-space: pre" v-for="theThrow in player.lastThrows" :key="theThrow.timestamp">{{ throwValue(theThrow.multiplier,theThrow.field) }}</td>
               </tr>
             </tbody>
             </template>
         </v-simple-table>
       </v-col>
-      <v-col cols="6">
+      <v-col v-if="false" cols="12">
         <DartBoard @clicked-score="onScoreClick"/>
       </v-col>
     </v-row>
@@ -117,6 +117,16 @@ export default class ActiveGame extends Vue {
     if (p.score == 0) return "green";
     if (p.status == "bust") return "red";
     if (p.player == store.state.currentPlayer) return "blue";
+  }
+
+  throwValue(multiplier: number, value: number) {
+    let prefix = "";
+    if(multiplier==2) {
+      prefix = "D";
+    } else if (multiplier==3) {
+      prefix = "T"
+    }
+    return prefix+value;
   }
 
   async undoThrow() {
